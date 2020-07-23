@@ -16,9 +16,20 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT password FROM user WHERE name = '$loginUser'";
+// Normal Statement
+// $sql = "SELECT password FROM user WHERE name = '$loginUser'";
+//$result = $conn->query($sql);
 
-$result = $conn->query($sql);
+// Prepared Statement
+$sql = "SELECT password, id FROM user WHERE name = ?";
+
+$statement = $conn->prepare($sql);
+
+$statement->bind_param("s", $loginUser);
+
+$statement->execute();
+
+$result = $statement->get_result();
 
 if ($result->num_rows > 0) {
   // output data of each row
@@ -28,7 +39,7 @@ if ($result->num_rows > 0) {
     }
 
     else{
-        echo "Wrong credentials";
+        echo "Wrong password";
     }
   }
 } else {
